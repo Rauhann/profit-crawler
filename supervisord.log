@@ -1,0 +1,4 @@
+2025-01-14 19:43:52,583 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2025-01-14 19:43:52,585 INFO supervisord started with pid 528
+2025-01-14 19:43:53,589 INFO spawned: 'horizon' with pid 534
+2025-01-14 19:43:54,926 INFO success: horizon entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

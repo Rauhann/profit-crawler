@@ -1,0 +1,106 @@
+openapi: 3.1.0
+info:
+  description: Documentação da api de crawler de lucors
+  version: 1.0.0
+  title: Profit Crawler
+  contact:
+    name: Rauhann Chaves
+    email: rauhann2711@gmail.com
+servers:
+  - url: http://localhost/api
+    description: Local server
+
+paths:
+  /api/crawler:
+    post:
+      summary: Realiza a consulta de lucro das empresas
+      operationId: requestProfit
+      tags:
+        - Crawler
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rule:
+                  type: string
+                  description: Regra de comparação do lucro
+                  enum:
+                    - greater
+                    - between
+                    - smaller
+                billions:
+                  type: number
+                  description: O valor do lucro em bilhões
+                  example: 100
+                range:
+                  type: array
+                  description: Intervalo para a regra "between", contendo dois valores numéricos. É obrigatório quando rule for "between"
+                  items:
+                    type: number
+                  example: [50, 150]
+              required:
+                - rule
+                - billions
+      responses:
+        '200':
+          description: Sucesso na consulta, dados das empresas com lucro
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    company_name:
+                      type: string
+                      description: Nome da empresa
+                      example: "Empresa Teste"
+                    profit:
+                      type: number
+                      description: Lucro da empresa em bilhões
+                      example: 12.34
+                    rank:
+                      type: integer
+                      description: Ranking da empresa
+                      example: 45
+              example:
+                - company_name: "Empresa A"
+                  profit: 12.34
+                  rank: 45
+                - company_name: "Empresa B"
+                  profit: 8.21
+                  rank: 56
+                - company_name: "Empresa C"
+                  profit: 5.67
+                  rank: 89
+        '400':
+          description: Requisição inválida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  code:
+                    type: integer
+                example:
+                  message: "O campo 'billions' deve ser um número."
+                  code: 400
+        '500':
+          description: Erro no servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  code:
+                    type: integer
+                example:
+                  message: "Erro inesperado ao processar a requisição."
+                  code: 500

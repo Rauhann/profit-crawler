@@ -1,0 +1,71 @@
+  volumes:
+    profit-crawler-mysql:
+      driver: 'local'
+    profit-crawler-cache:
+      driver: 'local'
+
+  networks:
+    profit-crawler-net:
+      driver: 'bridge'
+
+  services:
+    db:
+      container_name: profit-crawler-db
+      image: mysql:8.0
+      volumes:
+        - profit-crawler-mysql:/var/lib/mysql
+      restart: always
+      tty: true
+      ports:
+        - "3000:3306"
+      environment:
+        - MYSQL_DATABASE=${DB_DATABASE}
+        - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+        - MYSQL_USER=${DB_USERNAME}
+        - MYSQL_PASSWORD=${DB_PASSWORD}
+      networks:
+        - profit-crawler-net
+
+    cache:
+      container_name: profit-crawler-redis
+      image: redis:alpine3.17
+      command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}"
+      volumes:
+        - profit-crawler-cache:/data
+      ports:
+        - "3001:6379"
+      restart: always
+      networks:
+        - profit-crawler-net
+
+    webserver:
+      container_name: profit-crawler-nginx
+      image: nginx:1.21.6
+      volumes:
+        - ./:/app
+        - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      ports:
+        - "80:80"
+        - "443:443"
+      restart: always
+      depends_on:
+        - db
+        - app
+        - cache
+      tty: true
+      networks:
+        - profit-crawler-net
+
+    app:
+      container_name: profit-crawler-app
+      build:
+        context: .
+        dockerfile: ./docker/Dockerfile
+      volumes:
+        - ./:/app
+      ports:
+        - "9000"
+      restart: always
+      tty: true
+      networks:
+        - profit-crawler-net
