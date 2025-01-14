@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Enums\ProfitDataSourceEnum;
 use App\Http\Requests\RequestProfitRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class RequestProfitController extends Controller
@@ -18,6 +19,7 @@ class RequestProfitController extends Controller
             $result = $dataSource->getSourceClass()->execute($dataSource->getWebSite(), $request->all());
             return $this->toJson($result, 200);
         } catch (Throwable $exception) {
+            Log::error("Error request profit: " . $exception->getMessage());
             return $this->toJson([], $exception->getMessage(), $exception->getCode());
         }
     }

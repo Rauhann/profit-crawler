@@ -10,6 +10,7 @@ use App\Helpers\NumberHelper;
 use App\Models\CrawlerRequest;
 use App\Models\ProfitTracked;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\DomCrawler\Crawler;
 use Throwable;
 
@@ -59,6 +60,7 @@ abstract class ProfitService
                 return $html;
             });
         } catch (Throwable $exception) {
+            Log::error("Error execute crawler on $source " . $exception->getMessage());
             $html = null;
         }
         return [
