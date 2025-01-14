@@ -1,6 +1,8 @@
 # Sobre
 
-API para buscar lucro de empresas baseado em crawler
+API para buscar lucro de empresas baseado em crawler. O arquivo na raiz do projeto "Makefile" é um encurtador de comandos. Para usá-lo, basta instalar a dependencia make, caso use Linux, e utilize para as instruções a seguir.
+
+Caso não tenha instalado e não consiga usá-lo, basta encontrar o comando correspondente no "Makefile" e executar manualmente os comandos.
 
 # Instruções de uso
 
