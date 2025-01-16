@@ -31,6 +31,11 @@ class WikipediaSourceService extends ProfitService
         return "Lucro(em bilhões de US$)";
     }
 
+    public function activeField(): string
+    {
+        return "Ativos(em bilhões de US$)";
+    }
+
     public function getSourceResponseKeys(array $crawlerData): array
     {
         $response = [];

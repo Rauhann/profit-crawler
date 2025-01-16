@@ -20,6 +20,8 @@ abstract class ProfitService
 
     abstract function profitField(): string;
 
+    abstract function activeField(): string;
+
     abstract protected function getSourceResponseKeys(array $crawlerData): array;
 
     final public function execute(
@@ -32,11 +34,13 @@ abstract class ProfitService
             return [];
         }
         $crawlerData = $this->buildCrawlerData($crawlerData);
+        $crawlerType = $this->getDataType($filters['type'] ?? null);
         $crawlerDataFiltered = $this->filterCrawlerData(
             crawlerData: $crawlerData,
             rule: $filters['rule'],
             billions: $filters['billions'],
-            range: $filters['range'] ?? []
+            range: $filters['range'] ?? [],
+            crawlerType: $crawlerType
         );
         return $this->buildResponse(
             crawlerData: $crawlerData,
@@ -44,6 +48,14 @@ abstract class ProfitService
             crawlerRequestId: $crawler['crawler_request_id'],
             saveResponse: $crawler['save_result']
         );
+    }
+
+    private function getDataType(?string $type): string
+    {
+        return match ($type) {
+            'active' => $this->activeField(),
+            default => $this->profitField()
+        };
     }
 
     protected function executeCrawler(string $source): array
@@ -93,11 +105,11 @@ abstract class ProfitService
         array $crawlerData,
         string $rule,
         string $billions,
-        array $range = []
+        array $range = [],
+        string $crawlerType
     ): array {
-        return array_filter($crawlerData, function ($item) use ($rule, $billions, $range) {
-            $field = $this->profitField();
-            $profit = $this->convertToBillions($item[$field]);
+        return array_filter($crawlerData, function ($item) use ($rule, $billions, $range, $crawlerType) {
+            $profit = $this->convertToBillions($item[$crawlerType]);
             return match ($rule) {
                 ProfitTracked::RULE_GREATER => $profit > $billions,
                 ProfitTracked::RULE_SMALLER => $profit < $billions,
@@ -149,9 +161,10 @@ abstract class ProfitService
         int $crawlerRequestId,
         array $data
     ): void {
+        $profitTrackedService = new ProfitTrackedService();
         foreach ($data as $item) {
             $item['crawler_request_id'] = $crawlerRequestId;
-            (new ProfitTrackedService())->saveProfitTracked($item);
+            $profitTrackedService->saveProfitTracked($item);
         }
     }
 }

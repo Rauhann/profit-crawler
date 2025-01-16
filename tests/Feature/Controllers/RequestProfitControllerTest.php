@@ -12,11 +12,25 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class RequestProfitControllerTest extends TestCase
 {
-    public function testRequestProfit_WithValidParams_ShouldReturnProfit(): void
+    public function testRequestProfit_WithoutTypeAndValidParams_ShouldReturnProfit(): void
     {
         $payload = [
             'rule' => ProfitTracked::RULE_GREATER,
             'billions' => '100',
+        ];
+        $response = $this->postJson('/api/crawler', $payload);
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                '*' => ['company_name', 'profit', 'rank']
+            ]);
+    }
+
+    public function testRequestProfit_WithActiveTypeAndValidParams_ShouldReturnActive(): void
+    {
+        $payload = [
+            'rule' => ProfitTracked::RULE_GREATER,
+            'billions' => '100',
+            'type' => 'active',
         ];
         $response = $this->postJson('/api/crawler', $payload);
         $response->assertStatus(200)
@@ -167,6 +181,19 @@ class RequestProfitControllerTest extends TestCase
             'expected_message' => [
                 'range' => [
                     'O primeiro valor do range deve ser menor que o segundo.'
+                ]
+            ]
+        ];
+        yield 'with invalid type' => [
+            'payload' => [
+                'rule' => ProfitTracked::RULE_GREATER,
+                'billions' => "50",
+                'type' => 'error',
+            ],
+            'missing_field' => ['type'],
+            'expected_message' => [
+                'type' => [
+                    'O campo type é inválido'
                 ]
             ]
         ];

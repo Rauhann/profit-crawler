@@ -12,6 +12,7 @@ class RequestProfitRequest extends AbstractRequest
     {
         return [
             'rule' => 'required|in:' . implode(',', ProfitTracked::getAllRules()),
+            'type' => 'sometimes|in:profit,active',
             'billions' => 'required|numeric|min:0',
             'range' => [
                 'required_if:rule,' . ProfitTracked::RULE_BETWEEN,
@@ -40,6 +41,7 @@ class RequestProfitRequest extends AbstractRequest
             'billions.numeric' => 'O campo :attribute deve ser um número',
             'billions.min' => 'O campo :attribute deve ser no mínimo 0',
             'range.required_if' => 'O campo :attribute é obrigatório quando a rule for ' . ProfitTracked::RULE_BETWEEN,
+            'type.in' => 'O campo :attribute é inválido',
         ];
     }
 }
